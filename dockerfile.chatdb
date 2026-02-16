@@ -1,0 +1,33 @@
+FROM python:3.12.3-slim AS base
+
+WORKDIR /app
+
+# Dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# instalando requirements
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# --- Solo copiar lo que necesito ---
+COPY .env .
+COPY src ./src
+COPY front ./front
+
+# Copiar configuración de supervisord y entrypoint
+COPY supervisord.conf /etc/supervisord.conf
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+
+EXPOSE 8000
+EXPOSE 8051
+
+ENTRYPOINT ["/app/entrypoint.sh"]
