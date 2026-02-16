@@ -24,8 +24,8 @@ services:
     env_file:
       - .env
     ports:
-      - "8000:8000"
-      - "8051:8051"
+      - "${FASTAPI_PORT}:8000"
+      - "${STREAMLIT_PORT}:8051"
     depends_on:
       postgres-db:
         condition: service_healthy
