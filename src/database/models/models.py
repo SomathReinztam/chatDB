@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import Column, Integer, String, JSON, DateTime, func, ForeignKey
+from sqlalchemy import Column, Integer, String, JSON, DateTime, func, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
 
@@ -42,3 +42,13 @@ class MessageModel(Base):
 
 
 
+class AnalystModel(Base):
+    __tablename__ = "analyst"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    user_id = Column(Integer, ForeignKey("user2.user_id"), nullable=False)
+    chat_id = Column(Integer, ForeignKey("chat.chat_id"), nullable=False)
+
+    final_analysis = Column(Text)
+    analysis = Column(Text)

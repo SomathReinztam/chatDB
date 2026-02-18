@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from ..models import models as chat_models
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage, ToolCall
-from  ...chatDB.prompts.chatPrompts import SYSTEM_PROMPT_3
+from  ...chatDB.prompts.chatPrompts import SYSTEM_PROMPT_4
 from langchain_google_genai import ChatGoogleGenerativeAI
 from ...chatDB.grphs.chatdb import create_chat_agent
 from sqlalchemy.engine import URL
@@ -37,9 +37,12 @@ def run_chat(user_id : int, chat_id : int, human_message : str) -> List[Dict[str
     message_history = session.query(chat_models.MessageModel).filter_by(user_id=user_id, chat_id=chat_id).order_by(chat_models.MessageModel.date.asc()).all()
     logger.info("historial de conversacion recuperado de la db\n")
 
+    database_analysis_records = session.query(chat_models.AnalystModel).filter_by(user_id=user_id, chat_id=chat_id).all()
+    data_analysis = database_analysis_records[0].final_analysis
+
     logger.info(f"====== Recuperando el estado del agente \n")
     messages = []
-    messages.append(SystemMessage(content=SYSTEM_PROMPT_3))
+    messages.append(SystemMessage(content=SYSTEM_PROMPT_4.format(data_analysis=data_analysis)))
 
     for msg in message_history:
         if msg.role == "Human":

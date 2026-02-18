@@ -2,11 +2,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from src.database.crud.crud import CrudHelper
 from src.database.crud.run_chat import run_chat
+from src.analystagent.get_data_analysis import get_data_analysis
 from pydantic import BaseModel
 from typing import List, Dict, Any, Union, Literal, Optional
 from src.utils import settings
 
+from src.utils.logging_config import setup_base_logging
 
+setup_base_logging()
 app = FastAPI()
 
 crud_helper = CrudHelper(db_host=settings.DB_HOST, db_pass=settings.DB_PASS, db_user=settings.DB_USER, db_name=settings.DB_NAME, db_port=settings.DB_PORT)
@@ -80,6 +83,31 @@ async def run_chat_api(body: RunChat):
         human_message=body.human_message
     )
 
+
+# -----------------------
+
+class GetAnalysisResponse(BaseModel):
+    final_analysis : str
+
+class GetAnalysis(BaseModel):
+    db_user : str
+    db_pass : str
+    db_host : str
+    db_port : str
+    db_name : str
+    query : str
+
+@app.post("/getanalysis", response_model=GetAnalysisResponse)
+async def get_data_analysis_api(body : GetAnalysis):
+    return get_data_analysis(
+        db_user=body.db_user,
+        db_pass=body.db_pass,
+        db_host=body.db_host,
+        db_port=body.db_port,
+        db_name=body.db_name,
+        query=body.query
+    )
+    
 
 
 
